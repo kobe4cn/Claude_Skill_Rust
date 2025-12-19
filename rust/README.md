@@ -92,6 +92,7 @@ Claude Code 会根据以下条件自动激活技能：
 
 1. **总体技能**：检测到 Cargo.toml 或 *.rs 文件时激活 `rust/SKILL.md`
 2. **子技能**：根据问题关键词激活对应的子技能
+3. **基础技能**：`core`、`errors`、`testing` 始终相关，建议默认阅读
 
 ### 技能层级
 
@@ -99,6 +100,7 @@ Claude Code 会根据以下条件自动激活技能：
 rust/SKILL.md (总体入口)
 ├── core/SKILL.md (始终相关)
 ├── errors/SKILL.md (始终相关)
+├── testing/SKILL.md (始终相关)
 └── [特性技能] (按需激活)
 ```
 
@@ -106,12 +108,12 @@ rust/SKILL.md (总体入口)
 
 | 用户请求 | 激活的技能 |
 |----------|-----------|
-| "创建新的 Rust 项目" | rust, core |
-| "添加 Axum Web API" | rust, core, axum |
-| "实现 SQLx 数据库层" | rust, core, database |
-| "构建 CLI 工具" | rust, core, cli |
-| "设置 gRPC 服务" | rust, core, grpc |
-| "添加 Prometheus 指标" | rust, core, observability |
+| "创建新的 Rust 项目" | rust, core, errors, testing |
+| "添加 Axum Web API" | rust, core, errors, testing, axum |
+| "实现 SQLx 数据库层" | rust, core, errors, testing, database |
+| "构建 CLI 工具" | rust, core, errors, testing, cli |
+| "设置 gRPC 服务" | rust, core, errors, testing, grpc |
+| "添加 Prometheus 指标" | rust, core, errors, testing, observability |
 
 ## 技术栈
 
@@ -151,29 +153,34 @@ rust/SKILL.md (总体入口)
   - 检查清单
   - 测试策略
 
-## 来源
+## 来源与规则模块
 
 这些技能从 `.cursor/rules/rust/` 中的 22 个 MDC 规则文件转换而来：
 
-| 来源规则 | 对应技能 |
-|----------|----------|
-| core/code-quality.mdc, dependencies.mdc, type-system.mdc, performance.mdc, security.mdc | core |
-| core/api-design.mdc | api-design |
-| core/design-patterns.mdc | design-patterns |
-| features/axum.mdc | axum |
-| features/database.mdc | database |
-| features/cli.mdc | cli |
-| features/protobuf-grpc.mdc | grpc |
-| features/concurrency.mdc | concurrency |
-| features/configuration.mdc | config |
-| features/observability.mdc | observability |
-| features/utilities.mdc | utilities |
-| features/tools-and-config.mdc | tools-config |
-| features/http-client.mdc | http-client |
-| quality/error-handling.mdc | errors |
-| quality/testing.mdc | testing |
-| complex/workspace.mdc | workspace |
-| simple/single-crate.mdc | simple-crate |
+| 模块 | 规则文件 | 对应技能 | 说明 |
+|------|----------|----------|------|
+| **Root** | `main.mdc` | rust (总体) | 规则加载体系、复杂度判定、特性检测 |
+| **Core** | `core/code-quality.mdc` | core | Rust 2024 与代码质量规范 |
+| **Core** | `core/dependencies.mdc` | core | 依赖管理与 workspace 规范 |
+| **Core** | `core/type-system.mdc` | core | 类型系统模式（newtype/phantom） |
+| **Core** | `core/performance.mdc` | core | 性能优化与内存管理 |
+| **Core** | `core/security.mdc` | core | 安全模式（加密/哈希/密钥） |
+| **Core** | `core/api-design.mdc` | api-design | API 设计与 builder 模式 |
+| **Core** | `core/design-patterns.mdc` | design-patterns | 设计模式与 actor 模型 |
+| **Simple** | `simple/single-crate.mdc` | simple-crate | 单 crate 项目结构 |
+| **Complex** | `complex/workspace.mdc` | workspace | 多 crate workspace 管理 |
+| **Web** | `features/axum.mdc` | axum | Axum 0.8 + OpenAPI |
+| **Database** | `features/database.mdc` | database | SQLx 仓储与测试 |
+| **CLI** | `features/cli.mdc` | cli | Clap 4.0 + 子命令 |
+| **Protobuf & gRPC** | `features/protobuf-grpc.mdc` | grpc | Prost/Tonic 0.13+ |
+| **Concurrency** | `features/concurrency.mdc` | concurrency | Tokio 与并发模式 |
+| **Configuration** | `features/configuration.mdc` | config | 多格式配置与热重载 |
+| **Observability** | `features/observability.mdc` | observability | 指标/追踪/健康检查 |
+| **Tools & Config** | `features/tools-and-config.mdc` | tools-config | tracing/YAML/MiniJinja |
+| **Utilities** | `features/utilities.mdc` | utilities | JWT/derive/工具库 |
+| **HTTP Client** | `features/http-client.mdc` | http-client | reqwest/重试/错误处理 |
+| **Testing** | `quality/testing.mdc` | testing | 单元/集成测试标准 |
+| **Errors** | `quality/error-handling.mdc` | errors | thiserror/anyhow 错误处理 |
 
 ## 同步维护
 

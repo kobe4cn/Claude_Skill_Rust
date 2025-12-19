@@ -87,22 +87,140 @@ cargo test
 cargo clippy -- -D warnings
 ```
 
-## 项目类型识别
+## 规则加载层级
+
+- `rust/SKILL.md` 作为总体入口
+- `core` / `errors` / `testing` 始终相关
+- 根据复杂度选择 `simple-crate` 或 `workspace`
+- 根据需求加载特性技能（axum/database/grpc/...）
+
+## 项目复杂度判定
 
 ### 简单项目 (Single Crate)
-- 单个 `src/main.rs` 或 `src/lib.rs`
-- < 5000 行代码
-- 加载：`core`, `errors` + 按需加载特性技能
-
-### 中等复杂度 (Multi-Feature)
-- 多个功能模块
-- 5000-20000 行代码
-- 加载：`core`, `errors` + 多个特性技能
+- **单一功能域**：CLI 工具、库、简单服务
+- **代码规模**：预计 < 10,000 行
+- **团队规模**：1-3 人
+- **依赖集成**：较少
+- **部署形态**：单个二进制或库
+- **加载**：`core` + `errors` + `testing` + `simple-crate` + 按需特性技能
 
 ### 复杂项目 (Workspace)
-- 多个相关包
-- > 20000 行代码
-- 加载：全部技能，特别是 `workspace`
+- **多个功能域**：认证、业务、数据处理等
+- **代码规模**：预计 > 10,000 行
+- **团队规模**：4+ 人或多团队
+- **共享组件**：需要共享库或多可部署单元
+- **部署形态**：多服务/多二进制
+- **加载**：`core` + `errors` + `testing` + `workspace` + 按需特性技能
+
+## 特性检测清单
+
+### Web Framework Requirements
+- [ ] HTTP 服务或 REST API
+- [ ] OpenAPI/Swagger 文档
+- [ ] SSE/WebSocket
+- [ ] → 加载 `axum`
+
+### Database Requirements
+- [ ] SQL 数据库访问
+- [ ] 迁移/连接池/仓储模式
+- [ ] → 加载 `database`
+
+### Concurrency Requirements
+- [ ] 异步任务、并发处理
+- [ ] 共享状态或锁竞争
+- [ ] → 加载 `concurrency`
+
+### Configuration Management Requirements
+- [ ] 多格式配置 (YAML/TOML/JSON)
+- [ ] 热重载与配置校验
+- [ ] → 加载 `config`
+
+### Observability Requirements
+- [ ] 指标、追踪、健康检查
+- [ ] → 加载 `observability`
+
+### Tools & Config Requirements
+- [ ] 结构化日志或 tracing
+- [ ] 模板渲染、JSONPath 提取
+- [ ] → 加载 `tools-config`
+
+### Serialization Requirements
+- [ ] JSON 序列化或外部 API
+- [ ] camelCase 规则
+- [ ] → 使用 `core` 的 Serde 规范
+
+### Builder Pattern Requirements
+- [ ] 复杂结构体 (4+ 字段)
+- [ ] 可选字段与流式构建
+- [ ] → 使用 `utilities` / `api-design` 的 TypedBuilder 模式
+
+### Utility Libraries Requirements
+- [ ] JWT/认证
+- [ ] 随机数据生成、派生宏
+- [ ] → 加载 `utilities`
+
+### CLI Application Requirements
+- [ ] 多子命令 CLI
+- [ ] 交互式提示或进度条
+- [ ] → 加载 `cli`
+
+### Protobuf & gRPC Requirements
+- [ ] Protobuf 数据结构
+- [ ] gRPC 服务与客户端
+- [ ] → 加载 `grpc`
+
+### HTTP Client Requirements
+- [ ] 外部 API 集成
+- [ ] 认证头与重试策略
+- [ ] → 加载 `http-client`
+
+## 规则加载示例
+
+- Web API：`core` + `errors` + `testing` + `axum` + `database` + `utilities`
+- CLI 工具：`core` + `errors` + `testing` + `cli` + `utilities`
+- gRPC 服务：`core` + `errors` + `testing` + `grpc` + `observability`
+- 配置管理：`core` + `errors` + `testing` + `config` + `observability`
+- 外部 API 客户端：`core` + `errors` + `testing` + `http-client`
+
+## 规则模块列表
+
+| 模块 | 文件 | 说明 |
+|------|------|------|
+| **Core** | `core/code-quality.mdc` | Rust 2024 与代码质量规范 |
+| **Core** | `core/dependencies.mdc` | 依赖管理与 workspace 规范 |
+| **Core** | `core/type-system.mdc` | 类型系统模式（newtype/phantom） |
+| **Core** | `core/performance.mdc` | 性能优化与内存管理 |
+| **Core** | `core/security.mdc` | 安全模式（加密/哈希/密钥） |
+| **Core** | `core/api-design.mdc` | API 设计与 builder 模式 |
+| **Core** | `core/design-patterns.mdc` | 设计模式与 actor 模型 |
+| **Simple** | `simple/single-crate.mdc` | 单 crate 项目结构 |
+| **Complex** | `complex/workspace.mdc` | 多 crate workspace 管理 |
+| **Web** | `features/axum.mdc` | Axum 0.8 + OpenAPI |
+| **Database** | `features/database.mdc` | SQLx 仓储与测试 |
+| **CLI** | `features/cli.mdc` | Clap 4.0 + 子命令 |
+| **Protobuf & gRPC** | `features/protobuf-grpc.mdc` | Prost/Tonic 0.13+ |
+| **Concurrency** | `features/concurrency.mdc` | Tokio 与并发模式 |
+| **Configuration** | `features/configuration.mdc` | 多格式配置与热重载 |
+| **Observability** | `features/observability.mdc` | 指标/追踪/健康检查 |
+| **Tools & Config** | `features/tools-and-config.mdc` | tracing/YAML/MiniJinja |
+| **Utilities** | `features/utilities.mdc` | JWT/derive/工具库 |
+| **HTTP Client** | `features/http-client.mdc` | reqwest/重试/错误处理 |
+| **Testing** | `quality/testing.mdc` | 单元/集成测试标准 |
+| **Errors** | `quality/error-handling.mdc` | thiserror/anyhow 错误处理 |
+
+## 开发前验证清单
+
+```markdown
+✓ RUST PROJECT VERIFICATION
+- 项目复杂度已判定？[SIMPLE/COMPLEX]
+- 特性已识别？[列出]
+- 规则已加载？[YES/NO]
+- Cargo.toml 结构已确认？[YES/NO]
+- 错误处理策略已选择？[thiserror/anyhow]
+- 使用 Rust 2024 版本？[YES/NO]
+- 无 unsafe 计划？[YES/NO]
+- Workspace 依赖已配置？[YES/NO]
+```
 
 ## 快速开始
 
@@ -113,7 +231,7 @@ cd my_api
 cargo add axum tokio serde sqlx anyhow
 ```
 
-参考子技能：`core`, `axum`, `database`, `errors`
+参考子技能：`core`, `errors`, `testing`, `axum`, `database`
 
 ### 新 CLI 工具
 ```bash
@@ -122,7 +240,7 @@ cd my_cli
 cargo add clap anyhow colored
 ```
 
-参考子技能：`core`, `cli`, `errors`
+参考子技能：`core`, `errors`, `testing`, `cli`
 
 ### 新 gRPC 服务
 ```bash
@@ -131,7 +249,7 @@ cd my_service
 cargo add tonic prost tokio
 ```
 
-参考子技能：`core`, `grpc`, `errors`, `observability`
+参考子技能：`core`, `errors`, `testing`, `grpc`, `observability`
 
 ## 子技能详情
 
