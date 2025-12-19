@@ -12,7 +12,7 @@ description: >-
 
 ## 技能概览
 
-本技能包含 17 个专注领域的子技能：
+本技能包含 18 个专注领域的子技能：
 
 | 子技能 | 用途 | 触发关键词 |
 |--------|------|-----------|
@@ -33,6 +33,7 @@ description: >-
 | **http-client** | HTTP 客户端 | reqwest, REST 客户端, API 集成 |
 | **testing** | 测试标准 | 单元测试, 集成测试, proptest, 基准测试 |
 | **simple-crate** | 单 crate 项目 | 项目结构, minimal main, 二进制/库 crate |
+| **lib-template** | 库项目模板 | cargo generate, lib template, 新库项目 |
 
 ## 核心技术栈
 
@@ -251,6 +252,17 @@ cargo add tonic prost tokio
 
 参考子技能：`core`, `errors`, `testing`, `grpc`, `observability`
 
+### 新库项目（使用模板）
+```bash
+# 安装 cargo-generate（如果未安装）
+cargo install cargo-generate
+
+# 从模板创建库项目
+cargo generate --git https://github.com/kobe4cn/rust-lib-template
+```
+
+参考子技能：`core`, `errors`, `testing`, `lib-template`
+
 ## 子技能详情
 
 每个子技能包含：
@@ -261,4 +273,4 @@ cargo add tonic prost tokio
 
 ## 来源
 
-这些技能从 `.cursor/rules/rust/` 中的 22 个 MDC 规则文件转换而来，整合为 17 个专注领域的技能。
+这些技能从 `.cursor/rules/rust/` 中的 22 个 MDC 规则文件转换而来，整合为 18 个专注领域的技能（包括 `lib-template` 用于标准化库项目初始化）。

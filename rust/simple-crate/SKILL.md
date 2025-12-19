@@ -97,6 +97,10 @@ mod tests {
 
 ## Library Crate Structure
 
+> **Tip**: For library projects with CI/CD, pre-commit hooks, and security tooling pre-configured,
+> consider using the lib-template: `cargo generate --git https://github.com/kobe4cn/rust-lib-template`
+> See `../lib-template/` for details.
+
 ```
 my_lib/
 ├── Cargo.toml
@@ -167,5 +171,6 @@ fn main() -> anyhow::Result<()> {
 ## See Also
 
 - `reference.md` - Complete patterns and Cargo.toml templates
+- `../lib-template/` - Standardized library project template with CI/CD, pre-commit hooks, and security tooling
 - `../workspace/` - Multi-crate workspace organization
 - `../core/` - Code quality standards

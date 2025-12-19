@@ -56,7 +56,10 @@
 ├── testing/              # 测试标准 (单元/集成/属性/基准)
 │   ├── SKILL.md
 │   └── reference.md
-└── simple-crate/         # 单 crate 项目结构
+├── simple-crate/         # 单 crate 项目结构
+│   ├── SKILL.md
+│   └── reference.md
+└── lib-template/         # 库项目模板 (cargo-generate)
     ├── SKILL.md
     └── reference.md
 ```
@@ -83,6 +86,7 @@
 | **http-client** | HTTP 客户端 | reqwest, REST 客户端, API 集成, HTTP 请求 |
 | **testing** | 测试标准 | 单元测试, 集成测试, proptest, criterion, mockall |
 | **simple-crate** | 单 crate 项目结构 | 项目结构, minimal main, 二进制 crate, 库 crate |
+| **lib-template** | 库项目模板 | cargo generate, lib template, 新库项目 |
 
 ## 使用方式
 
@@ -114,6 +118,7 @@ rust/SKILL.md (总体入口)
 | "构建 CLI 工具" | rust, core, errors, testing, cli |
 | "设置 gRPC 服务" | rust, core, errors, testing, grpc |
 | "添加 Prometheus 指标" | rust, core, errors, testing, observability |
+| "使用模板创建新库" | rust, core, errors, testing, lib-template |
 
 ## 技术栈
 
